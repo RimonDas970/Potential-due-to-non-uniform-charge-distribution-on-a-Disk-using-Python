@@ -1,0 +1,41 @@
+
+#Problem: Potential Due to a Non-Uniform Charge Distribution on a Disk
+import numpy as np
+
+# Constants
+epsilon_0 = 8.854e-12  # Permittivity of free space (C^2/(N*m^2))
+
+def integrand_problem(r):
+    z = 2  # Distance above the disk (m)
+    return (1 / (2 * epsilon_0)) * ((r**2) * np.exp(-r)) / np.sqrt(r**2 + z**2)
+
+# trapezoidal rule
+def trapezoidal_rule(func, a, b, n):
+    r_values = np.linspace(a, b, n + 1)
+    integral = 0.5 * (func(r_values[0]) + func(r_values[-1]))  # First and last terms
+    integral += np.sum(func(r_values[1:-1]))  # Middle terms
+    return integral * (b - a) / n
+
+# Simpson's 1/3 rule
+def simpsons_rule(func, a, b, n):
+    if n % 2 != 0:
+        raise ValueError("n must be even")
+    r_values = np.linspace(a, b, n + 1)
+    integral = func(r_values[0]) + func(r_values[-1])  # First and last terms
+    integral += 4 * np.sum(func(r_values[1:-1:2]))  # Odd indexed terms
+    integral += 2 * np.sum(func(r_values[2:-2:2]))  # Even indexed terms
+    return integral * (b - a) / (3 * n)
+
+# Set the interval and number of intervals
+a, b = 0, 6
+n_trapz = 6  # for trapezoidal rule
+n_simps = 6  # for Simpson's rule
+
+# Calculate potential V using both methods
+V_trapz = trapezoidal_rule(integrand_problem, a, b, n_trapz)
+V_simps = simpsons_rule(integrand_problem, a, b, n_simps)
+
+# Print potential V
+print("Problem - Electric Potential V:")
+print(f"Using Trapezoidal Rule: V = {V_trapz:.2e} V")
+print(f"Using Simpson's 1/3 Rule: V = {V_simps:.2e} V")
